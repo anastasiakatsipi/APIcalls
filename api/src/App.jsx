@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import LogoutButton from "./components/LogoutButton";
 
+
 export default function App() {
   const { isAuthenticated } = useAuth();
 

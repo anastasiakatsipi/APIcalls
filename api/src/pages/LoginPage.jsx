@@ -21,7 +21,7 @@ export default function LoginPage() {
 
   return (
     <form onSubmit={handleSubmit} style={{ display: "grid", gap: 8, maxWidth: 300 }}>
-      <h2>Σύνδεση</h2>
+      <h2 class="text-2xl font-bold underline">Σύνδεση</h2>
       <input
         placeholder="Username"
         value={username}
