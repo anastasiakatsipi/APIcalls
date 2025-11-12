@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Akadimia",
+    "serviceUri": "http://www.disit.org/km4city/resource/iot/orion-1/Organization/akadimia"
+  },
+  {
+    "name": "gymnasio_gennadiou",
+    "serviceUri": "http://www.disit.org/km4city/resource/iot/orion-1/Organization/gymnasio_gennadiou"
+  },
+  {
+    "name": "gymnasio_kremastis",
+    "serviceUri": "http://www.disit.org/km4city/resource/iot/orion-1/Organization/gymnasio_kremastis"
+  },
+  {
+    "name": "kapnoviomichania",
+    "serviceUri": "http://www.disit.org/km4city/resource/iot/orion-1/Organization/kapnoviomichania"
+  },
+  {
+    "name": "kazouleio",
+    "serviceUri": "http://www.disit.org/km4city/resource/iot/orion-1/Organization/kazouleio"
+  },
+  {
+    "name": "lykeio_archangelou",
+    "serviceUri": "http://www.disit.org/km4city/resource/iot/orion-1/Organization/lykeio_archangelou"
+  },
+  {
+    "name": "oikokyriki",
+    "serviceUri": "http://www.disit.org/km4city/resource/iot/orion-1/Organization/oikokyriki"
+  },
+  {
+    "name": "venetokleio_a",
+    "serviceUri": "http://www.disit.org/km4city/resource/iot/orion-1/Organization/venetokleio_a"
+  },
+  {
+    "name": "venetokleio_b",
+    "serviceUri": "http://www.disit.org/km4city/resource/iot/orion-1/Organization/venetokleio_b"
+  }
+]
