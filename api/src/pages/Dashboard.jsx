@@ -2,7 +2,18 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { api } from "../services/apiClient";
 import schools from "../data/schools.json";
-import SchoolCard from "../components/SchoolCard";
+
+// imports για τα διαγράμματα
+import {
+  ResponsiveContainer,
+  BarChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  Bar,
+} from "recharts";
 
 const from = "2025-01-01";
 const to = "2025-02-01";
@@ -31,7 +42,7 @@ export default function Dashboard() {
       raw: data,
     };
   };
-
+  //<pre>{JSON.stringify(rows, null, 2)}</pre>
   const fetchAll = useCallback(async () => {
     setLoading(true);
     const results = await Promise.allSettled(schools.map(fetchOne));
@@ -47,9 +58,17 @@ export default function Dashboard() {
     fetchAll();
   }, [fetchAll]);
 
+  // 🔹 Προετοιμασία δεδομένων για το διάγραμμα
+  const chartData = rows
+    .filter((r) => r.co2 != null) // μόνο όσα έχουν τιμή CO2
+    .map((r) => ({
+      name: r.name,
+      co2: Number(r.co2),
+    }));
+
   return (
-    <div className="p-10 mx-10 space-y-4">
-      <div>
+    <div className="p-10 mx-10 space-y-6">
+      <div className="flex items-center gap-4">
         <button
           onClick={fetchAll}
           disabled={loading}
@@ -57,28 +76,47 @@ export default function Dashboard() {
         >
           {loading ? "Φόρτωση..." : "Ανανέωση όλων"}
         </button>
+
+        <span className="text-sm text-gray-600">
+          Διάγραμμα CO₂ ανά σχολείο (άξονας Χ = σχολεία, άξονας Υ = CO₂ σε ppm).
+        </span>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        {rows.map((s, i) => (
-          <SchoolCard
-            key={i}
-            school={{
-              name: s.name,
-              typeLabel: "School",
-              lat: s.lat,
-              lng: s.lng,
-              measuredTime: s.time,
-              metrics: {
-                temperature: s.temperature && Number(s.temperature),
-                humidity: s.humidity && Number(s.humidity),
-                co2: s.co2 && Number(s.co2),
-                pm25: s.pm25 && Number(s.pm25),
-              },
-            }}
-          />
-        ))}
+      <div className="w-full h-[500px] rounded-xl bg-white shadow p-4">
+        {chartData.length === 0 ? (
+          <div className="text-center text-gray-500 mt-10">
+            Δεν υπάρχουν διαθέσιμα δεδομένα CO₂ για εμφάνιση.
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={chartData}
+              margin={{ top: 20, right: 30, left: 10, bottom: 80 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis
+                dataKey="name"
+                angle={-45}
+                textAnchor="end"
+                interval={0}
+                height={80}
+              />
+              <YAxis
+                label={{
+                  value: "CO₂ (ppm)",
+                  angle: -90,
+                  position: "insideLeft",
+                }}
+              />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="co2" />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </div>
+
+
     </div>
   );
 }
