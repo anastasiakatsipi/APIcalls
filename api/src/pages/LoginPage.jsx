@@ -1,4 +1,3 @@
-// src/pages/LoginPage.jsx
 import React, { useState } from "react";
 import { useAuth } from "../auth/useAuth";
 
@@ -20,29 +19,49 @@ export default function LoginPage() {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "grid", gap: 8, maxWidth: 300 }}>
-      <h2 class="text-2xl font-bold underline">Σύνδεση</h2>
-      <input
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        placeholder="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <label>
+    <div className="flex items-center justify-center min-h-screen ">
+      <form
+        onSubmit={handleSubmit}
+        className="grid gap-3 max-w-xs mx-auto p-4 bg-white rounded-xl shadow"
+      >
+        <h2 className="text-2xl font-bold text-center">Σύνδεση</h2>
+
         <input
-          type="checkbox"
-          checked={remember}
-          onChange={(e) => setRemember(e.target.checked)}
+          className="border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-300"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
         />
-        Remember me
-      </label>
-      <button type="submit">Login</button>
-      {error && <small style={{ color: "red" }}>{error}</small>}
-    </form>
+
+        <input
+          className="border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-300"
+          placeholder="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={remember}
+            onChange={(e) => setRemember(e.target.checked)}
+            className="h-4 w-4"
+          />
+          Remember me
+        </label>
+
+        <button
+          type="submit"
+          className="bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+        >
+          Login
+        </button>
+
+        {error && (
+          <small className="text-red-600 text-center">{error}</small>
+        )}
+      </form>
+    </div>
   );
 }

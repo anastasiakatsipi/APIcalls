@@ -1,10 +1,3 @@
-// src/auth/AuthContext.jsx (AuthProvider)
-// Κρατά token και user (decoded από JWT). Συγχρονίζει user όταν αλλάζει το token. Εκθέτει:
-// isAuthenticated
-// login(credentials) → καλεί svcLogin, αποθηκεύει access_token στο state
-// logout() → καθαρίζει storage μέσω svcLogout και μηδενίζει token
-// Είναι το κεντρικό σημείο διαμοιρασμού auth κατάστασης/συναρτήσεων.
-
 import React, { createContext, useEffect, useMemo, useState } from "react";
 import { login as svcLogin, logout as svcLogout, getAccessToken, decodeJwt } from "../services/authService.js";
 

@@ -1,10 +1,3 @@
-// src/services/authService.js
-// Όλη η δουλειά με το Keycloak token endpoint μέσω proxy:
-// login({ username, password, remember }) → POST /kc-token με grant_type=password, βάζει access_token (και refresh_token αν υπάρχει) σε localStorage ή sessionStorage ανάλογα με remember.
-// getAccessToken() → διαβάζει token από storage.
-// decodeJwt(token) → κάνει decode το JWT payload σε αντικείμενο χρήστη.
-// logout() → καθαρίζει και τα δύο storages.
-
 import axios from "axios";
 
 const TOKEN_URL = "/kc-token"; // proxy προς Keycloak

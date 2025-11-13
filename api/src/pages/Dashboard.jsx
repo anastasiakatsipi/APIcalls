@@ -1,8 +1,8 @@
 // src/pages/Dashboard.jsx
 import React, { useEffect, useState, useCallback } from "react";
 import { api } from "../services/apiClient";
-import schools from "../data/schools.json"; // <— Η λίστα σου
-import SchoolCard from "../components/SchoolCard"; // ή RealtimeData για κάθε ένα
+import schools from "../data/schools.json";
+import SchoolCard from "../components/SchoolCard";
 
 const from = "2025-01-01";
 const to = "2025-02-01";
@@ -15,6 +15,7 @@ export default function Dashboard() {
     const { data } = await api.get("/ServiceMap/api/v1/", {
       params: { serviceUri: s.serviceUri, from, to },
     });
+
     const feat = data?.Service?.features?.[0];
     const rt = data?.realtime?.results?.bindings?.[0];
 
@@ -34,33 +35,50 @@ export default function Dashboard() {
   const fetchAll = useCallback(async () => {
     setLoading(true);
     const results = await Promise.allSettled(schools.map(fetchOne));
-    setRows(results.filter(r => r.status==="fulfilled").map(r => r.value));
+    setRows(
+      results
+        .filter((r) => r.status === "fulfilled")
+        .map((r) => r.value)
+    );
     setLoading(false);
   }, []);
 
-  useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
 
   return (
-    <div style={{display:"grid", gap:12}}>
+    <div className="p-10 mx-10 space-y-4">
       <div>
-        <button onClick={fetchAll} disabled={loading}>
+        <button
+          onClick={fetchAll}
+          disabled={loading}
+          className="px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg disabled:opacity-60"
+        >
           {loading ? "Φόρτωση..." : "Ανανέωση όλων"}
         </button>
       </div>
-      {rows.map((s, i) => (
-        <SchoolCard key={i} school={{
-          name: s.name,
-          typeLabel: "School",
-          lat: s.lat, lng: s.lng,
-          measuredTime: s.time,
-          metrics: {
-            temperature: s.temperature && Number(s.temperature),
-            humidity: s.humidity && Number(s.humidity),
-            co2: s.co2 && Number(s.co2),
-            pm25: s.pm25 && Number(s.pm25),
-          }
-        }}/>
-      ))}
+
+      <div className="grid grid-cols-3 gap-4">
+        {rows.map((s, i) => (
+          <SchoolCard
+            key={i}
+            school={{
+              name: s.name,
+              typeLabel: "School",
+              lat: s.lat,
+              lng: s.lng,
+              measuredTime: s.time,
+              metrics: {
+                temperature: s.temperature && Number(s.temperature),
+                humidity: s.humidity && Number(s.humidity),
+                co2: s.co2 && Number(s.co2),
+                pm25: s.pm25 && Number(s.pm25),
+              },
+            }}
+          />
+        ))}
+      </div>
     </div>
   );
 }

@@ -1,4 +1,3 @@
-// src/components/SchoolCard.jsx
 import React from "react";
 
 export default function SchoolCard({ school }) {
@@ -6,48 +5,59 @@ export default function SchoolCard({ school }) {
 
   const { name, lat, lng, measuredTime, metrics = {} } = school;
 
-  // helper για όμορφη εμφάνιση
-  const fmt = (val, unit = "") =>
-    val === null || val === undefined || val === "" ? "—" : `${val}${unit}`;
-
   return (
-    <div
-      style={{
-        border: "1px solid #ddd",
-        borderRadius: 12,
-        padding: 16,
-        boxShadow: "0 2px 6px rgba(0,0,0,0.05)",
-        background: "#fff",
-        maxWidth: 500,
-      }}
-    >
-      <h3 style={{ margin: "0 0 8px 0", color: "#333" }}>{name}</h3>
+    <div className="p-4 border rounded-xl shadow-sm bg-white max-w-md">
+      <h3 className="text-lg font-semibold mb-2">{name}</h3>
 
-      <p style={{ fontSize: 14, margin: "4px 0", color: "#666" }}>
+      <p className="text-sm text-gray-600">
         Συντεταγμένες: {lat ?? "—"}, {lng ?? "—"}
       </p>
 
-      <p style={{ fontSize: 13, margin: "4px 0", color: "#777" }}>
+      <p className="text-xs text-gray-500 mt-1">
         Ώρα μέτρησης:{" "}
         {measuredTime
           ? new Date(measuredTime).toLocaleString("el-GR")
           : "—"}
       </p>
 
-      <hr style={{ margin: "8px 0" }} />
+      <hr className="my-3" />
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: 8,
-          fontSize: 15,
-        }}
-      >
-        <Metric label="Θερμοκρασία" value={fmt(metrics.temperature, " °C")} />
-        <Metric label="Υγρασία" value={fmt(metrics.humidity, " %")} />
-        <Metric label="CO₂" value={fmt(metrics.co2, " ppb")} />
-        <Metric label="PM2.5" value={fmt(metrics.pm25, " mg/m³")} />
+      <div className="grid grid-cols-2 gap-2">
+        <Metric
+          label="Θερμοκρασία"
+          value={
+            metrics.temperature
+              ? metrics.temperature + " °C"
+              : "—"
+          }
+        />
+
+        <Metric
+          label="Υγρασία"
+          value={
+            metrics.humidity
+              ? metrics.humidity + " %"
+              : "—"
+          }
+        />
+
+        <Metric
+          label="CO₂"
+          value={
+            metrics.co2
+              ? metrics.co2 + " ppb"
+              : "—"
+          }
+        />
+
+        <Metric
+          label="PM2.5"
+          value={
+            metrics.pm25
+              ? metrics.pm25 + " mg/m³"
+              : "—"
+          }
+        />
       </div>
     </div>
   );
@@ -55,16 +65,9 @@ export default function SchoolCard({ school }) {
 
 function Metric({ label, value }) {
   return (
-    <div
-      style={{
-        background: "#f9f9f9",
-        borderRadius: 10,
-        padding: "10px 12px",
-        textAlign: "center",
-      }}
-    >
-      <div style={{ fontSize: 12, color: "#555" }}>{label}</div>
-      <div style={{ fontWeight: 500, fontSize: 16 }}>{value}</div>
+    <div className="p-2 bg-gray-100 rounded-lg text-center">
+      <div className="text-xs text-gray-600">{label}</div>
+      <div className="text-sm font-medium">{value}</div>
     </div>
   );
 }

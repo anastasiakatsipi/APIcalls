@@ -1,13 +1,9 @@
-// src/components/RealtimeData.jsx
 import React from "react";
 
 export default function RealtimeData({ data }) {
-  console.log("RealtimeData props.data =", data); // ← δες στο DevTools
+  console.log("RealtimeData props.data =", data);
 
   if (!data) return <p>⏳ Δεν έχει φορτώσει ακόμη δεδομένα…</p>;
-
-  // δείξε ωμό JSON για να επιβεβαιώσεις τη δομή
-  // (αφαίρεσέ το όταν τελειώσουμε)
   return (
     <div>
       <h3>Raw JSON preview</h3>
