@@ -5,15 +5,25 @@ export default function LoginPage() {
   const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [clientId, setClientId] = useState("");
+  const [clientSecret, setClientSecret] = useState("");
   const [remember, setRemember] = useState(true);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
     try {
-      await login({ username, password, remember });
-    } catch {
+      await login({
+        username,
+        password,
+        client_id: clientId,
+        client_secret: clientSecret,
+        remember,
+      });
+    } catch (err) {
+      console.error("Login error:", err?.response?.data || err);
       setError("Λάθος στοιχεία ή πρόβλημα σύνδεσης.");
     }
   };
@@ -39,6 +49,21 @@ export default function LoginPage() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+        />
+
+        <input
+          className="border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-300"
+          placeholder="Client ID"
+          value={clientId}
+          onChange={(e) => setClientId(e.target.value)}
+        />
+
+        <input
+          className="border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-300"
+          placeholder="Client Secret"
+          type="password"
+          value={clientSecret}
+          onChange={(e) => setClientSecret(e.target.value)}
         />
 
         <label className="flex items-center gap-2 text-sm">

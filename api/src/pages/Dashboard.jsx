@@ -1,4 +1,6 @@
-// src/pages/Dashboard.jsx
+// src/pages/Dashboard.jsx  
+//<pre>{JSON.stringify(rows, null, 2)}</pre>
+
 import React, { useEffect, useState, useCallback } from "react";
 import { api } from "../services/apiClient";
 import schools from "../data/schools.json";
@@ -42,7 +44,6 @@ export default function Dashboard() {
       raw: data,
     };
   };
-  //<pre>{JSON.stringify(rows, null, 2)}</pre>
   const fetchAll = useCallback(async () => {
     setLoading(true);
     const results = await Promise.allSettled(schools.map(fetchOne));
@@ -58,7 +59,7 @@ export default function Dashboard() {
     fetchAll();
   }, [fetchAll]);
 
-  // 🔹 Προετοιμασία δεδομένων για το διάγραμμα
+  // Προετοιμασία δεδομένων για το διάγραμμα
   const chartData = rows
     .filter((r) => r.co2 != null) // μόνο όσα έχουν τιμή CO2
     .map((r) => ({
@@ -116,7 +117,7 @@ export default function Dashboard() {
         )}
       </div>
 
-
+        <pre>{JSON.stringify(rows, null, 2)}</pre>
     </div>
   );
 }

@@ -7,30 +7,42 @@ function storage(remember) {
 }
 
 export function getAccessToken() {
-  return localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+  return (
+    localStorage.getItem("access_token") ||
+    sessionStorage.getItem("access_token")
+  );
 }
 
-export function decodeJwt(token) {    //Διαβάζει το token και “μεταφράζει” ποιος είναι ο χρήστης και πότε λήγει.
+export function decodeJwt(token) {
   try {
-    const [, payload] = token.split("."); //Κόβει το token στο . και παίρνει το payload (yyyyy).
-    return JSON.parse(atob(payload));  //Το μετατρέπει από Base64 σε κείμενο (atob(payload))
+    const [, payload] = token.split(".");
+    return JSON.parse(atob(payload));
   } catch {
     return null;
   }
 }
 
-export async function login({ username, password, remember = true }) {  //Στέλνει αίτημα στο Keycloak (μέσω proxy) για να πάρει token.
+export async function login({
+  username,
+  password,
+  client_id,
+  client_secret,
+  remember = true,
+}) {
   const form = new URLSearchParams({
     grant_type: "password",
     username,
     password,
   });
 
+  // 👉 Μικρό safety check για να δούμε αν έρχονται σωστά:
+  console.log("Login with:", { username, client_id, hasSecret: !!client_secret });
+
   const { data } = await axios.post(TOKEN_URL, form, {
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     auth: {
-      username: import.meta.env.VITE_CLIENT_ID,
-      password: import.meta.env.VITE_CLIENT_SECRET,
+      username: client_id,
+      password: client_secret,
     },
   });
 
