@@ -4,7 +4,7 @@ import { api } from "../services/apiClient";
 import schools from "../data/schools.json";
 import Co2Chart from "../components/themes/environment/Co2Chart";
 import TemperatureChart from "../components/themes/environment/TemperatureChart";
-
+import SchoolMap from "../components/main/SchoolMap";
 
 const from = "2025-01-01";
 const to = "2025-02-01";
@@ -27,6 +27,8 @@ export default function EnvironmentPage() {
       name: s.name || feat?.properties?.name,
       co2: rt?.co2?.value ?? null,
       temperature: rt?.temperature?.value ?? null,   // 👈 ΠΡΟΣΘΗΚΗ
+      lat: feat?.geometry?.coordinates?.[1] ?? null,
+      lng: feat?.geometry?.coordinates?.[0] ?? null,
     };
   } catch (err) {
     const status = err?.response?.status;
@@ -97,8 +99,7 @@ export default function EnvironmentPage() {
         {/* Θερμοκρασία */}
         <div className="grid-1"><TemperatureChart data={tempChartData} /></div>
       </div>
-      
-
+      <SchoolMap schools={rows} />
     </div>
   );
 }

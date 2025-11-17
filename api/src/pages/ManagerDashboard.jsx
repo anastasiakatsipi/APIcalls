@@ -1,5 +1,6 @@
 // src/pages/ManagerDashboard.jsx
 import React, { useState } from "react";
+import 'leaflet/dist/leaflet.css';
 import Sidebar from "../components/main/Sidebar";
 import LogoutButton from "../components/main/LogoutButton";
 import Energy from "./Energy";
