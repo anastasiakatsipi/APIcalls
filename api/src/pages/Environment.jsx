@@ -1,105 +1,105 @@
-// src/pages/EnvironmentPage.jsx
-import React, { useEffect, useState, useCallback } from "react";
-import { api } from "../services/apiClient";
-import schools from "../data/schools.json";
+// src/pages/Environment.jsx
+import React, { useEffect, useState } from "react";
+import { apiSuper } from "../services/apiClient";
 import Co2Chart from "../components/themes/environment/Co2Chart";
 import TemperatureChart from "../components/themes/environment/TemperatureChart";
 import SchoolMap from "../components/main/SchoolMap";
+import schoolsData from "../data/schools.json";
+import { apiSnap } from "../services/apiClient";
 
-const from = "2025-01-01";
-const to = "2025-02-01";
-
-export default function EnvironmentPage() {
+export default function Environment() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const fetchOne = async (s) => {
-  try {
-    const { data } = await api.get("/ServiceMap/api/v1/", {
-      params: { serviceUri: s.serviceUri, from, to },
-    });
+  const fetchAll = async () => {
+    try {
+      setLoading(true);
 
-    const feat = data?.Service?.features?.[0];
-    const rt = data?.realtime?.results?.bindings?.[0];
+      // 1️⃣ Φτιάχνουμε όλα τα serviceUri σε ένα string
+      const uriList = schoolsData.map(s => s.serviceUri).join(";");
 
-    return {
-      ok: true,
-      name: s.name || feat?.properties?.name,
-      co2: rt?.co2?.value ?? null,
-      temperature: rt?.temperature?.value ?? null,   // 👈 ΠΡΟΣΘΗΚΗ
-      lat: feat?.geometry?.coordinates?.[1] ?? null,
-      lng: feat?.geometry?.coordinates?.[0] ?? null,
-    };
-  } catch (err) {
-    const status = err?.response?.status;
-    console.warn(
-      `Δεν υπάρχουν δεδομένα / δεν έχει access για σχολείο: ${s.name} (status: ${status})`
-    );
-    return { ok: false, name: s.name };
-  }
-};
+      console.log("URI LIST:", uriList);
+      
+      // ---------------------------------------------------
+      // 1️⃣ ΚΑΝΕ ΜΙΑ ΚΑΘΑΡΗ ΚΛΗΣΗ ΣΤΟ EXACT URI ΠΟΥ ΘΕΛΕΙΣ
+      // ---------------------------------------------------
+      const { data } = await apiSnap.get("/ServiceMap/api/v1//iot-search/", {
+        params: {
+          selection: "36.0;27.7;36.6;28.3",
+          type: "RhodesBuildingProfile",
+          serviceUri: uriList,
+          format: "json",
+        },
+      });
 
+       
+      console.log("RESPONSE DATA:", data);
 
-  const fetchAll = useCallback(async () => {
-    setLoading(true);
+      const features = data?.features ?? [];
+      if (features.length === 0) {
+        console.warn("No devices found.");
+        setRows([]);
+        setLoading(false);
+        return;
+      }
 
-    const results = await Promise.all(schools.map(fetchOne));
+      // 2. Μετατροπή feature → row
+      const rows = features.map((f) => {
+        const props = f.properties;
+        const values = props.values || {};
 
-    const success = results.filter((r) => r.ok);
-    const failed = results.filter((r) => !r.ok);
+        return {
+          name: props.deviceName || props.name,
+          lat: f.geometry.coordinates[1],
+          lng: f.geometry.coordinates[0],
+          co2: Number(values.co2 ?? null),
+          temperature: Number(values.outdoor_temperature ?? null),
+        };
+      });
 
-    if (failed.length > 0) {
-      console.warn(
-        "Τα παρακάτω σχολεία δεν εμφανίστηκαν:",
-        failed.map((f) => f.name)
-      );
+      setRows(rows);
+      setLoading(false);
+
+    } catch (err) {
+      console.error("FETCH ERROR:", err);
+      setLoading(false);
     }
-
-    setRows(success);
-    setLoading(false);
-  }, []);
+  };
 
   useEffect(() => {
     fetchAll();
-  }, [fetchAll]);
+  }, []);
 
-  const chartData = rows
-    .filter((r) => r.co2 != null)
-    .map((r) => ({
-      name: r.name,
-      co2: Number(r.co2),
-    }));
-
-    const tempChartData = rows
-  .filter((r) => r.temperature != null)
-  .map((r) => ({
-    name: r.name,
-    temperature: Number(r.temperature),
-  }));
-
+  const chartData = rows.map((r) => ({ name: r.name, co2: r.co2 }));
+  const tempData = rows.map((r) => ({ name: r.name, temperature: r.temperature }));
 
   return (
-    
-    <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold">Environment – CO₂ Levels</h2>
-        <button
-          onClick={fetchAll}
-          disabled={loading}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg disabled:opacity-50"
-        >
-          {loading ? "Φόρτωση..." : "Ανανέωση"}
-        </button>
+    <div className="p-8 space-y-6 w-full mx-auto max-w-6xl">
+      <h2 className="text-3xl font-bold text-gray-800 mb-4">
+        📊 Environment – CO₂ & Temperature Levels
+      </h2>
+
+      <button
+        onClick={fetchAll}
+        disabled={loading}
+        className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 disabled:opacity-50"
+      >
+        {loading ? "Φόρτωση..." : "Ανανέωση Δεδομένων"}
+      </button>
+
+      <div className="grid grid-cols-2 gap-6">
+        <div className="p-4 bg-white rounded-xl shadow-md">
+          <Co2Chart data={chartData} />
+        </div>
+
+        <div className="p-4 bg-white rounded-xl shadow-md">
+          <TemperatureChart data={tempData} />
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 space-x-4">
-        {/* C02 */}
-        <div className="grid-1"><Co2Chart data={chartData} /></div>
-        
-        {/* Θερμοκρασία */}
-        <div className="grid-1"><TemperatureChart data={tempChartData} /></div>
+      <div className="p-4 bg-white rounded-xl shadow-md">
+        <SchoolMap schools={rows} />
       </div>
-      <SchoolMap schools={rows} />
     </div>
   );
 }

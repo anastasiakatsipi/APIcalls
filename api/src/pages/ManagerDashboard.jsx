@@ -1,52 +1,67 @@
 // src/pages/ManagerDashboard.jsx
 import React, { useState } from "react";
-import 'leaflet/dist/leaflet.css';
+import "leaflet/dist/leaflet.css";
 import Sidebar from "../components/main/Sidebar";
 import LogoutButton from "../components/main/LogoutButton";
-import Energy from "./Energy";
 import Environment from "./Environment";
+import Energy from "./Energy";
 
 export default function ManagerDashboard() {
   const [activeSection, setActiveSection] = useState("environment");
 
-  let content = null;
+  const renderSection = () => {
+    switch (activeSection) {
+      case "environment":
+        return <Environment />;
 
-  if (activeSection === "environment") {
-    content = <Environment />;
-  } else if (activeSection === "energy") {
-    content = (
-      <div className="p-6">
-        <h2 className="text-xl font-semibold mb-2">Energy</h2>
-        <p className="text-gray-600">
-          Σελίδα Energy – προς το παρόν δεν υπάρχουν διαθέσιμα δεδομένα.
-        </p>
-      </div>
-    );
-  } else if (activeSection === "mobility") {
-    content = (
-      <div className="p-6">
-        <h2 className="text-xl font-semibold mb-2">Mobility</h2>
-        <p className="text-gray-600">
-          Σελίδα Mobility – προς το παρόν δεν υπάρχουν διαθέσιμα δεδομένα.
-        </p>
-      </div>
-    );
-  }
+      case "energy":
+        return (
+          <div className="card">
+            <h2 className="text-xl font-semibold mb-2">Energy</h2>
+            <p className="text-gray-600">
+              Σελίδα Energy – προς το παρόν δεν υπάρχουν διαθέσιμα δεδομένα.
+            </p>
+          </div>
+        );
+
+      case "mobility":
+        return (
+          <div className="card">
+            <h2 className="text-xl font-semibold mb-2">Mobility</h2>
+            <p className="text-gray-600">
+              Σελίδα Mobility – προς το παρόν δεν υπάρχουν διαθέσιμα δεδομένα.
+            </p>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
-<div className="flex min-h-screen bg-gray-900/20 ">
-      {/* Sidebar αριστερά */}
-      <Sidebar activeItem={activeSection} onSelect={setActiveSection} />
+    <div className="flex overflow-hidden">
 
-      {/* Περιεχόμενο δεξιά */}
-      <div className="flex-1 flex flex-col">
-        <div className="flex justify-end p-4">
+      {/* Sidebar */}
+      <Sidebar
+        activeItem={activeSection}
+        onSelect={setActiveSection}
+      />
+
+      {/* Content */}
+      <div className="flex-1 flex flex-col bg-gray-100 min-h-screen">
+
+        {/* Top bar */}
+        <div className="flex justify-end p-4 bg-white shadow-sm border-b">
           <LogoutButton />
         </div>
 
-        <div className="flex-1 p-4">{content}</div>
+        {/* Main content */}
+        <div className="p-8 w-full max-w-6xl mx-auto">
+          {renderSection()}
+        </div>
+
       </div>
     </div>
-
   );
 }

@@ -18,11 +18,18 @@ export default defineConfig({
           ),
         secure: true, // άφησέ το true (https)
       },
-       "/snap": {   //Ό,τι request ξεκινά με /snap θα περάσει από αυτόν τον κανόνα
-        target: "https://snap4.rhodes.gr",
-        changeOrigin: true,
-        rewrite: (p) => p.replace(/^\/snap/, ""), // αφαιρεί το /snap prefix
-        secure: true,
+       "/snap": {
+          target: "https://snap4.rhodes.gr",
+          changeOrigin: true,
+          secure: true,
+          rewrite: (p) => p.replace(/^\/snap/, ""),
+        },
+
+        "/super": {
+          target: "https://snap4.rhodes.gr/ServiceMap/api/v1/iot-search/",
+          changeOrigin: true,
+          secure: true,
+          rewrite: (p) => p.replace(/^\/super/, ""),
         },
     },
   },

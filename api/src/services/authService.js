@@ -8,11 +8,10 @@ function storage(remember) {
 }
 
 export function getAccessToken() {
-  return (
-    localStorage.getItem("access_token") ||
-    sessionStorage.getItem("access_token")
-  );
+  const token = localStorage.getItem("access_token");
+  return token;
 }
+
 
 export function getRefreshToken() {
   return (

@@ -1,64 +1,75 @@
 // src/services/apiClient.js
 import axios from "axios";
-import {
-  getAccessToken,
-  refreshTokens,
-  logout as svcLogout,
-} from "./authService";
+import { getAccessToken, refreshTokens, logout as svcLogout } from "./authService";
 
-// Δημιουργούμε ένα axios instance για τα API calls προς Snap4City
-export const api = axios.create({
-  baseURL: "/snap", // όπως ήδη το έχεις
+// -----------------------------------------------------------------------------
+// 1️⃣ Δημιουργία axios instances για Snap & Super
+// -----------------------------------------------------------------------------
+
+export const apiSnap = axios.create({
+  baseURL: "/snap",
 });
 
-// 🔹 Request interceptor – βάζει πάντα το Authorization header
-api.interceptors.request.use(
-  (config) => {
-    const token = getAccessToken();
-    if (token) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+export const apiSuper = axios.create({
+  baseURL: "/super",
+});
 
-// 🔹 Response interceptor – παίζει το "refresh" παιχνίδι όταν πάρουμε 401
-api.interceptors.response.use(
-  (response) => response,
+// -----------------------------------------------------------------------------
+// 2️⃣ Common request interceptor (μπαίνει token)
+// -----------------------------------------------------------------------------
+
+function attachAuthToken(config) {
+  const token = getAccessToken();
+  if (token) {
+    config.headers = config.headers || {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+}
+
+apiSnap.interceptors.request.use(attachAuthToken);
+apiSuper.interceptors.request.use(attachAuthToken);
+
+// -----------------------------------------------------------------------------
+// 3️⃣ Refresh token ONLY για SNAP API (όπως πρέπει)
+// -----------------------------------------------------------------------------
+
+apiSnap.interceptors.response.use(
+  (res) => res,
+
   async (error) => {
     const originalRequest = error.config;
 
-    // Αν δεν έχουμε response ή δεν είναι 401 → απλά πέτα το error
+    // Αν δεν είναι 401 → πέτα error
     if (!error.response || error.response.status !== 401) {
       return Promise.reject(error);
     }
 
-    // Αποφεύγουμε infinite loop
+    // Αν έχει ήδη προσπαθήσει μία φορά → πέτα error
     if (originalRequest._retry) {
       return Promise.reject(error);
     }
+
     originalRequest._retry = true;
 
     try {
-      // Προσπάθησε να κάνεις refresh
+      // Κάνουμε refresh
       const newAccessToken = await refreshTokens();
 
-      // Βάλε το νέο token στο header του αρχικού request
+      // Ξαναβάζουμε το νέο token
       originalRequest.headers = originalRequest.headers || {};
       originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
 
-      // Ξαναδοκίμασε το αρχικό request με το νέο token
-      return api(originalRequest);
-    } catch (refreshError) {
-      console.error("Refresh token failed:", refreshError);
+      // Ξανακάνουμε το request
+      return apiSnap(originalRequest);
 
-      // Αν αποτύχει το refresh → καθαρίζουμε και πάμε για login
+    } catch (err) {
+      console.error("❌ Refresh token failed:", err);
+
       svcLogout();
-      window.location.href = "/"; // ή "/login" ανάλογα τι έχεις
-
-      return Promise.reject(refreshError);
+      window.location.href = "/";
+      return Promise.reject(err);
     }
   }
 );
